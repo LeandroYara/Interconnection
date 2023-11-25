@@ -169,10 +169,7 @@ public class TablaHashSeparteChaining <K extends Comparable<K>, V extends Compar
 				{
 					for (int j=1; j<=listaNodos.getElement(i).size(); j++)
 					{
-						if (listaNodos.getElement(i).getElement(j)!= null)
-						{
-							lista.insertElement(listaNodos.getElement(i).getElement(j).getKey(), lista.size()+1);
-						}
+						insertKeyNode(lista, listaNodos, i, j);
 					}
 				}
 			}
@@ -199,10 +196,7 @@ public class TablaHashSeparteChaining <K extends Comparable<K>, V extends Compar
 				{
 					for (int j=1; j<= listaNodos.getElement(i).size(); j++)
 					{
-						if (listaNodos.getElement(i).getElement(j)!= null)
-						{
-							lista.insertElement(listaNodos.getElement(i).getElement(j).getValue(), lista.size()+1);
-						}
+						insertValueNode(lista, listaNodos, i, j);
 					}
 				}
 				
@@ -214,6 +208,18 @@ public class TablaHashSeparteChaining <K extends Comparable<K>, V extends Compar
 		}
 		
 		return lista;
+	}
+
+	private void insertKeyNode(ILista<K> lista, ILista<ILista<NodoTS<K, V>>> listaNodos, int i, int j) throws PosException, VacioException, NullException{
+		if (listaNodos.getElement(i).getElement(j)!= null) {
+				lista.insertElement(listaNodos.getElement(i).getElement(j).getKey(), lista.size()+1);
+		}
+	}
+
+	private void insertValueNode(ILista<V> lista, ILista<ILista<NodoTS<K, V>>> listaNodos, int i, int j) throws PosException, VacioException, NullException{
+		if (listaNodos.getElement(i).getElement(j)!= null) {
+				lista.insertElement(listaNodos.getElement(i).getElement(j).getValue(), lista.size()+1);
+		}
 	}
 
 	@Override

@@ -766,27 +766,21 @@ public class Modelo {
 			}
 			
 
-			if(landing1!=null)
+			if(landing1!=null || landing2!=null)
 			{
-				if(landing2!=null)
+				Edge existe1= grafo.getEdge(landing1.getLandingId() + cableid, landing2.getLandingId() + cableid);
+
+				if(existe1==null)
 				{
-					Edge existe1= grafo.getEdge(landing1.getLandingId() + cableid, landing2.getLandingId() + cableid);
-	
-					if(existe1==null)
-					{
-						float weight3=distancia(landing1.getLongitude(), landing1.getLatitude(), landing2.getLongitude(), landing2.getLatitude());
-						grafo.addEdge(landing1.getLandingId() + cableid, landing2.getLandingId() + cableid, weight3);
-					}
-					else
-					{
-						float weight3=distancia(landing1.getLongitude(), landing1.getLatitude(), landing2.getLongitude(), landing2.getLatitude());
-						float peso3= existe1.getWeight();
-	
-						if(weight3> peso3)
-						{
-							existe1.setWeight(weight3);
-						}
-					}
+					float weight3=distancia(landing1.getLongitude(), landing1.getLatitude(), landing2.getLongitude(), landing2.getLatitude());
+					grafo.addEdge(landing1.getLandingId() + cableid, landing2.getLandingId() + cableid, weight3);
+				}
+				else
+				{
+					float weight3=distancia(landing1.getLongitude(), landing1.getLatitude(), landing2.getLongitude(), landing2.getLatitude());
+					float peso3= existe1.getWeight();
+
+					checkWeight(weight3, peso3, existe1);
 				}
 			}
 			
@@ -851,16 +845,7 @@ public class Modelo {
 			{
 				for(int j=1; j<=((ILista) valores.getElement(i)).size(); j++)
 				{
-					Vertex vertice1;
-					if((ILista) valores.getElement(i) != null)
-					{
-						vertice1= (Vertex) ((ILista) valores.getElement(i)).getElement(j);
-						for(int k=2; k<= ((ILista) valores.getElement(i)).size(); k++)
-						{
-							Vertex vertice2= (Vertex) ((ILista) valores.getElement(i)).getElement(k);
-							grafo.addEdge(vertice1.getId(), vertice2.getId(), 100);
-						}
-					}
+					addVertex(valores, i, j);
 				}
 			}
 		}
@@ -869,10 +854,25 @@ public class Modelo {
 			e.printStackTrace();
 		}
 		
-	
-		
-	
-}
+	}
+
+	private void checkWeight(float weight, float peso, Edge existe){
+		if(weight > peso) {
+			existe.setWeight(weight);
+		}
+	}
+
+	private void addVertex(ILista valores, int i, int j) throws PosException, VacioException{
+		Vertex vertice1;
+		if((ILista) valores.getElement(i) != null) {
+			vertice1= (Vertex) ((ILista) valores.getElement(i)).getElement(j);
+			for(int k=2; k<= ((ILista) valores.getElement(i)).size(); k++)
+			{
+				Vertex vertice2= (Vertex) ((ILista) valores.getElement(i)).getElement(k);
+				grafo.addEdge(vertice1.getId(), vertice2.getId(), 100);
+			}
+		}
+	}
 	
 	private static float distancia(double lon1, double lat1, double lon2, double lat2) 
 	{
