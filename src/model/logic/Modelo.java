@@ -16,7 +16,6 @@ import model.data_structures.GrafoListaAdyacencia;
 import model.data_structures.ILista;
 import model.data_structures.ITablaSimbolos;
 import model.data_structures.Landing;
-import model.data_structures.ListaEncadenada;
 import model.data_structures.NodoTS;
 import model.data_structures.NullException;
 import model.data_structures.PilaEncadenada;
@@ -40,9 +39,9 @@ public class Modelo {
 	private ILista datos;
 	
 	private GrafoListaAdyacencia grafo;
-	
+
 	private ITablaSimbolos paises;
-	
+
 	private ITablaSimbolos points;
 	
 	private ITablaSimbolos landingidtabla;
@@ -228,30 +227,7 @@ public class Modelo {
 		{
 			Edge arco= ((Edge)pila.pop());
 
-			if(arco.getSource().getInfo().getClass().getName().equals("model.data_structures.Landing"))
-			{
-				longorigen=((Landing)arco.getSource().getInfo()).getLongitude();
-				latorigen=((Landing)arco.getSource().getInfo()).getLongitude();
-				origennombre=((Landing)arco.getSource().getInfo()).getLandingId();
-			}
-			if(arco.getSource().getInfo().getClass().getName().equals("model.data_structures.Country"))
-			{
-				longorigen=((Country)arco.getSource().getInfo()).getLongitude();
-				latorigen=((Country)arco.getSource().getInfo()).getLongitude();
-				origennombre=((Country)arco.getSource().getInfo()).getCapitalName();
-			}
-			if (arco.getDestination().getInfo().getClass().getName().equals("model.data_structures.Landing"))
-			{
-				latdestino=((Landing)arco.getDestination().getInfo()).getLatitude();
-				longdestino=((Landing)arco.getDestination().getInfo()).getLatitude();
-				destinonombre=((Landing)arco.getDestination().getInfo()).getLandingId();
-			}
-			if(arco.getDestination().getInfo().getClass().getName().equals("model.data_structures.Country"))
-			{
-				longdestino=((Country)arco.getDestination().getInfo()).getLatitude();
-				latdestino=((Country)arco.getDestination().getInfo()).getLatitude();
-				destinonombre=((Country)arco.getDestination().getInfo()).getCapitalName();
-			}
+			determinarOrigenDestino(arco, longorigen, longdestino, latorigen, latdestino, origennombre, destinonombre);
 
 			distancia = distancia(longdestino,latdestino, longorigen, latorigen);
 			fragmento+= "\n \n Origen: " +origennombre + "  Destino: " + destinonombre + "  Distancia: " + distancia;
@@ -263,6 +239,35 @@ public class Modelo {
 
 		return fragmento;
 		
+	}
+
+	public void determinarOrigenDestino(Edge arco, double longorigen, double longdestino, double latorigen, double latdestino,
+	String origennombre, String destinonombre)
+	{
+	if(arco.getSource().getInfo().getClass().getName().equals("model.data_structures.Landing"))
+		{
+			longorigen=((Landing)arco.getSource().getInfo()).getLongitude();
+			latorigen=((Landing)arco.getSource().getInfo()).getLongitude();
+			origennombre=((Landing)arco.getSource().getInfo()).getLandingId();
+		}
+		if(arco.getSource().getInfo().getClass().getName().equals("model.data_structures.Country"))
+		{
+			longorigen=((Country)arco.getSource().getInfo()).getLongitude();
+			latorigen=((Country)arco.getSource().getInfo()).getLongitude();
+			origennombre=((Country)arco.getSource().getInfo()).getCapitalName();
+		}
+		if (arco.getDestination().getInfo().getClass().getName().equals("model.data_structures.Landing"))
+		{
+			latdestino=((Landing)arco.getDestination().getInfo()).getLatitude();
+			longdestino=((Landing)arco.getDestination().getInfo()).getLatitude();
+			destinonombre=((Landing)arco.getDestination().getInfo()).getLandingId();
+		}
+		if(arco.getDestination().getInfo().getClass().getName().equals("model.data_structures.Country"))
+		{
+			longdestino=((Country)arco.getDestination().getInfo()).getLatitude();
+			latdestino=((Country)arco.getDestination().getInfo()).getLatitude();
+			destinonombre=((Country)arco.getDestination().getInfo()).getCapitalName();
+		}
 	}
 	
 	public String req4String()
@@ -476,23 +481,17 @@ public class Modelo {
 						Vertex actual= (Vertex) lista.getElement(i);
 						Vertex siguiente= (Vertex) lista.getElement(i+1);
 
-						if(siguiente!=null)
+						if(siguiente!=null && comparador.compare(actual, siguiente)!=0)
 						{
-							if(comparador.compare(actual, siguiente)!=0)
-							{
 								lista2.insertElement(actual, lista2.size()+1);
-							}
 						}
 						else
 						{
 							Vertex anterior= (Vertex) lista.getElement(i-1);
-
-							if(anterior!=null)
+							
+							if(anterior!=null && comparador.compare(anterior, actual)!=0)
 							{
-								if(comparador.compare(anterior, actual)!=0)
-								{
-									lista2.insertElement(actual, lista2.size()+1);
-								}
+								lista2.insertElement(actual, lista2.size()+1);
 							}
 							else
 							{
@@ -540,18 +539,7 @@ public class Modelo {
 						else
 						{
 							Country anterior= (Country) lista.getElement(i-1);
-
-							if(anterior!=null)
-							{
-								if(comparador.compare(anterior, actual)!=0)
-								{
-									lista2.insertElement(actual, lista2.size()+1);
-								}
-							}
-							else
-							{
-								lista2.insertElement(actual, lista2.size()+1);
-							}
+							comparadorAnteriorActual(lista2, comparador, anterior, actual);
 						}
 
 					}
@@ -565,6 +553,17 @@ public class Modelo {
 		}
 
 		return lista2;
+	}
+
+	private void comparadorAnteriorActual(ILista lista2, Comparator<Country> comparador, Country anterior, Country actual) throws PosException, NullException{
+		if(anterior!=null && comparador.compare(anterior, actual)!=0)
+		{	
+			lista2.insertElement(actual, lista2.size()+1);
+		}
+		else
+		{
+			lista2.insertElement(actual, lista2.size()+1);
+		}
 	}
 	
 	public ITablaSimbolos unificarHash(ILista lista)
@@ -626,13 +625,25 @@ public class Modelo {
 		return tabla;
 	}
 
+	private TablaHashLinearProbing crearTablaHashLinearProbing(int tamInicial){
+		return new TablaHashLinearProbing(tamInicial);
+	}
+
+	private TablaHashSeparteChaining crearTablaHashSeparteChaining(int tamInicial){
+		return new TablaHashSeparteChaining(tamInicial);
+	}
+
+	private GrafoListaAdyacencia crearGrafoListaAdyacencia(int numVertices){
+		return new GrafoListaAdyacencia(numVertices);
+	}
+
 	public void cargar() throws IOException
 	{
-		grafo= new GrafoListaAdyacencia(2);
-		paises= new TablaHashLinearProbing(2);
-		points= new  TablaHashLinearProbing(2);
-		landingidtabla= new TablaHashSeparteChaining(2);
-		nombrecodigo=new TablaHashSeparteChaining(2);
+		grafo= crearGrafoListaAdyacencia(2);
+		paises= crearTablaHashLinearProbing(2);
+		points= crearTablaHashLinearProbing(2);
+		landingidtabla= crearTablaHashSeparteChaining(2);
+		nombrecodigo= crearTablaHashSeparteChaining(2);
 		
 		Reader in = new FileReader("./data/countries.csv");
 		Iterable<CSVRecord> records = CSVFormat.RFC4180.withHeader().parse(in);
