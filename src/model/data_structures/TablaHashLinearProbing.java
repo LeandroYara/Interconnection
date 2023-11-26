@@ -32,35 +32,48 @@ public class TablaHashLinearProbing <K extends Comparable<K>, V extends Comparab
 	}
 
 	@Override
-	public void put(K key, V value) 
-	{
-		int posicion= hash(key);
-		try 
-		{
-			NodoTS<K, V> nodo= listaNodos.getElement(posicion);
-			if (nodo!=null && !nodo.isEmpty())
-			{
-				posicion=getNextEmpty(posicion);
-			}
+	public void put(K key, V value) {
+	    int initialPosition = hash(key);
 
-			NodoTS<K, V> nuevo= new NodoTS<K, V>(key, value);
-			listaNodos.changeInfo(posicion, nuevo);
-			tamanoAct++;
+	    try {
+	        int newPosition = findEmptyPosition(initialPosition);
+	        NodoTS<K, V> newNode = new NodoTS<>(key, value);
+	        listaNodos.changeInfo(newPosition, newNode);
+	        tamanoAct++;
 
-		} 
-		catch (PosException | VacioException| NullException e) 
-		{
-			e.printStackTrace();
-		}
-		double tam= tamanoAct;
-		double tam2=tamanoTabla;
-		double tamanoCarga= tam/tam2;
+	        checkAndPerformRehash();
 
-		if (tamanoCarga > 0.75)
-		{
-			rehash();
-		}
-		
+	    } catch (PosException | VacioException | NullException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	private int findEmptyPosition(int initialPosition) throws PosException, VacioException {
+	    int currentPosition = initialPosition;
+
+	    while (true) {
+	        NodoTS<K, V> currentNode = listaNodos.getElement(currentPosition);
+	        if (currentNode == null || currentNode.isEmpty()) {
+	            return currentPosition;
+	        }
+
+	        currentPosition = getNextPosition(currentPosition);
+	    }
+	}
+
+	private int getNextPosition(int currentPosition) {
+	    int newPosition = (currentPosition % tamanoTabla) + 1;
+	    if (newPosition > tamanoTabla) {
+	        newPosition = 1;
+	    }
+	    return newPosition;
+	}
+
+	private void checkAndPerformRehash() {
+	    double loadFactor = (double) tamanoAct / tamanoTabla;
+	    if (loadFactor > 0.75) {
+	        rehash();
+	    }
 	}
 
 	public int getNextEmpty(int posicion)

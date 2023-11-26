@@ -206,39 +206,35 @@ public class GrafoListaAdyacencia <K extends Comparable<K> ,V extends Comparable
 		
 	}
 	
-	public GrafoListaAdyacencia<K, V> reverse()
-	{
-		GrafoListaAdyacencia<K, V> copia= new GrafoListaAdyacencia<K, V>(numVertices());
-		ILista<Vertex<K, V>> vertices2= vertices();
-		ILista<Edge<K, V>> arcos= edges();
-
-		for(int i=1; i<= vertices2.size(); i++)
-		{
-		
-			Vertex<K, V> actual;
+	public GrafoListaAdyacencia<K, V> reverse() {
+		GrafoListaAdyacencia<K, V> copia = new GrafoListaAdyacencia<>(numVertices());
+		copyVertices(copia);
+		copyEdges(copia);
+		return copia;
+	}
+	
+	private void copyVertices(GrafoListaAdyacencia<K, V> copia) {
+		ILista<Vertex<K, V>> verticesLista = vertices();
+		for (int i = 1; i <= verticesLista.size(); i++) {
 			try {
-				actual = vertices2.getElement(i);
+				Vertex<K, V> actual = verticesLista.getElement(i);
 				copia.insertVertex(actual.getId(), actual.getInfo());
 			} catch (PosException | VacioException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
-		for(int i=1; i<= arcos.size(); i++)
-		{
-			Edge<K, V> actual;
+	}
+	
+	private void copyEdges(GrafoListaAdyacencia<K, V> copia) {
+		ILista<Edge<K, V>> arcos = edges();
+		for (int i = 1; i <= arcos.size(); i++) {
 			try {
-				actual = arcos.getElement(i);
+				Edge<K, V> actual = arcos.getElement(i);
 				copia.addEdge(actual.getDestination().getId(), actual.getSource().getId(), actual.getWeight());
 			} catch (PosException | VacioException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
-		return copia;
-		
 	}
 	
 	public ITablaSimbolos<K, Integer> getSSC()

@@ -25,37 +25,29 @@ public class TablaSimbolos <K extends Comparable<K>, V extends Comparable <V>> i
 	}
 
 	@Override
-	public V get(K key) 
-	{
-		
-		int i = 1;
-		int f = keySet().size();
-		while ( i <= f)
-		{	
-			int m = (i + f) / 2;
-		
-			try 
-			{
-				if ( keySet().getElement(m).compareTo(key)==0 )
-				{
-					return listaNodos.getElement(m).getValue();
-				}
-				else if (keySet().getElement(m).compareTo(key)>0 )
-				{
-					f = m - 1;
-				}
-				else
-				{
-					i = m +1;
-				}
-			} 
-			catch (PosException | VacioException e) 
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return null;
+	public V get(K key) {
+	    int lowerBound = 1;
+	    int upperBound = size();
+
+	    while (lowerBound <= upperBound) {
+	        int middle = (lowerBound + upperBound) / 2;
+
+	        try {
+	            K middleKey = keySet().getElement(middle);
+
+	            if (middleKey.compareTo(key) == 0) {
+	                return listaNodos.getElement(middle).getValue();
+	            } else if (middleKey.compareTo(key) > 0) {
+	                upperBound = middle - 1;
+	            } else {
+	                lowerBound = middle + 1;
+	            }
+	        } catch (PosException | VacioException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    return null;
 	}
 
 	@Override
